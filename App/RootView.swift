@@ -8,11 +8,7 @@ struct RootView: View {
         if store.goal == nil {
             OnboardingView(store: store)
         } else {
-            // TEMPORARY placeholder. We build the real ActivityView in Stage 4.
-            Text("Activity (Stage 4)")
-                .foregroundStyle(AppColors.textPrimary)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(AppColors.background.ignoresSafeArea())
+            ActivityView(store: store)
         }
     }
 }

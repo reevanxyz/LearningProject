@@ -48,12 +48,17 @@ struct OnboardingView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                Button("Start Learning") {
+                Button {
                     viewModel.saveGoal()
+                } label: {
+                    Text("Start Learning")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundStyle(AppColors.textPrimary)
                 }
-                .buttonStyle(GlassPillButtonStyle(tint: AppColors.learnedOrange))
+                .buttonStyle(.glassProminent)
+                .tint(AppColors.learnedOrange)
+                .controlSize(.large)
                 .disabled(!viewModel.canSubmit)
-                .opacity(viewModel.canSubmit ? 1 : 0.4)
 
                 Text("You can edit your goal later")
                     .font(.footnote)

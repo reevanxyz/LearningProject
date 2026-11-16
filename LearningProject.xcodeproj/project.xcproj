@@ -32,11 +32,27 @@
       "children": [
         { "path": "GoalFormViewModel.swift", "target-membership": [ "LearningProject/compile-sources" ] },
       ],
-    }, {
+    },
+    { "path": "<PRODUCTS>/LearningProject.app", "id": "EBADAC5E30A9EC8F00B675C0", "type": "wrapper.application", "index": false },
+    {
       "kind": "group",
       "path": "Views",
       "children": [
         {
+          "kind": "folder",
+          "path": "Activity",
+          "membership-exceptions": [
+            {
+              "target": "LearningProject",
+              "inclusions": [
+                "ActivityView.swift",
+                "DayCircleView.swift",
+                "StatCardView.swift",
+                "WeekStripView.swift",
+              ],
+            },
+          ],
+        }, {
           "kind": "folder",
           "path": "Onboarding",
           "membership-exceptions": [
@@ -55,6 +71,7 @@
               "target": "LearningProject",
               "inclusions": [
                 "DurationChip.swift",
+                "GlassIconButton.swift",
                 "GoalFormFields.swift",
               ],
             },
@@ -62,7 +79,6 @@
         },
       ],
     },
-    { "path": "<PRODUCTS>/LearningProject.app", "id": "EBADAC5E30A9EC8F00B675C0", "type": "wrapper.application", "index": false },
   ],
   "targets": [
     {

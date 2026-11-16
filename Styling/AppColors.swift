@@ -32,8 +32,8 @@ enum AppColors {
     static let divider = Color(hex: 0x2C2C2E)         // field underline
 
     // Brand colors
-    static let learnedOrange = Color(hex: 0xF58A25)
-    static let freezeBlue = Color(hex: 0x32C8F5)
+    static let learnedOrange = Color(hex: 0xFF9230)
+    static let freezeBlue = Color(hex: 0x3CD3FE)
 
     // Tinted circles (week strip and calendar days)
     static let learnedTint = learnedOrange.opacity(0.15)
