@@ -57,7 +57,8 @@ final class ActivityViewModel {
         case .frozen:
             return .frozen
         case nil:
-            return calendar.isDate(date, inSameDayAs: now) ? .today : .plain
+            let isToday = calendar.isDate(date, inSameDayAs: now)
+            return (isToday && goalStatus == .active) ? .today : .plain
         }
     }
 
@@ -85,6 +86,10 @@ final class ActivityViewModel {
 
     var canFreeze: Bool { store.canFreezeToday(at: now) }
     var freezeButtonTitle: String { todayStatus == .frozen ? "Freezed for a day" : "Freeze for a day" }
+    
+    var goalStatus: GoalStatus {
+        store.goalStatus(at: now)
+    }
 
     // MARK: - Actions
 

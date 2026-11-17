@@ -1,10 +1,14 @@
 import SwiftUI
 
 struct ActivityView: View {
+    private let store: LearningStore
     @State private var viewModel: ActivityViewModel
+    @State private var isShowingGoalForm = false
+    @State private var isShowingCalendar = false
     @Environment(\.scenePhase) private var scenePhase
 
     init(store: LearningStore) {
+        self.store = store
         _viewModel = State(initialValue: ActivityViewModel(store: store))
     }
 
@@ -19,22 +23,60 @@ struct ActivityView: View {
             statCards
                 .padding(.top, 12)
 
-            Spacer()
-            logLearnedButton
-            Spacer()
-
-            freezeSection
+            content
         }
         .padding(.top, 4)
         .padding(.bottom, 11)
         .background(AppColors.background.ignoresSafeArea())
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationDestination(isPresented: $isShowingGoalForm) {
+            LearningGoalView(store: store)
+        }
+        .navigationDestination(isPresented: $isShowingCalendar) {
+            CalendarView(store: store)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 viewModel.refresh()
             }
         }
     }
+    // MARK: - Content below the stat cards
 
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.goalStatus {
+        case .active:
+            VStack(spacing: 0) {
+                Spacer()
+                logLearnedButton
+                Spacer()
+                freezeSection
+            }
+        case .completed:
+            resultContent(
+                systemImage: "hands.sparkles.fill",
+                title: "Well done!",
+                subtitle: "Ready for your next goal?"
+            )
+        case .failed:
+            resultContent(
+                systemImage: "xmark.seal",
+                title: "You didn't reach your goal this time.",
+                subtitle: "Want to set another goal?"
+            )
+        }
+    }
+
+    private func resultContent(systemImage: String, title: String, subtitle: String) -> some View {
+        VStack(spacing: 0) {
+            GoalResultView(systemImage: systemImage, title: title, subtitle: subtitle) {
+                isShowingGoalForm = true
+            }
+            .padding(.top, 69)
+            Spacer()
+        }
+    }
     // MARK: - Sections
 
     private var header: some View {
@@ -44,9 +86,13 @@ struct ActivityView: View {
                     .font(.system(size: 34, weight: .bold))
                     .foregroundStyle(AppColors.textPrimary)
                 Spacer()
-                // Actions are wired in later stages (Calendar: Stage 8, goal: Stage 7).
-                GlassIconButton(icon: Image(systemName: "calendar")) { }
-                GlassIconButton(icon: Image(systemName: "pencil.and.outline")) { }
+                GlassIconButton(icon: Image(systemName: "calendar")) {
+                    isShowingCalendar = true
+                }
+                GlassIconButton(icon: Image(systemName: "pencil.and.outline")) {
+                    isShowingGoalForm = true
+                    
+                }
             }
             Text(viewModel.dateText)
                 .font(.body)
@@ -114,10 +160,35 @@ struct ActivityView: View {
     }
 }
 
-#Preview {
-    let defaults = UserDefaults(suiteName: "ActivityPreview")!
-    let _ = defaults.removePersistentDomain(forName: "ActivityPreview")
-    let store = LearningStore(defaults: defaults)
+/// A store that saves into its own throwaway storage, so previews never touch real data.
+private func makePreviewStore(_ suite: String) -> LearningStore {
+    let defaults = UserDefaults(suiteName: suite)!
+    defaults.removePersistentDomain(forName: suite)
+    return LearningStore(defaults: defaults)
+}
+
+#Preview("Active") {
+    let store = makePreviewStore("ActivityPreviewActive")
     let _ = store.setGoal(topic: "Swift", duration: .week)
-    ActivityView(store: store)
+    NavigationStack { ActivityView(store: store) }
+}
+
+#Preview("Completed") {
+    let store = makePreviewStore("ActivityPreviewCompleted")
+    let start = Calendar.current.date(byAdding: .day, value: -6, to: .now)!
+    let _ = store.setGoal(topic: "Swift", duration: .week, now: start)
+    let _ = (0..<7).forEach { offset in
+        let day = Calendar.current.date(byAdding: .day, value: offset, to: start)!
+        store.logLearned(now: day)
+    }
+    NavigationStack { ActivityView(store: store) }
+}
+
+#Preview("Failed") {
+    let store = makePreviewStore("ActivityPreviewFailed")
+    let start = Calendar.current.date(byAdding: .day, value: -3, to: .now)!
+    let _ = store.setGoal(topic: "Swift", duration: .week, now: start)
+    let _ = store.logLearned(now: start)
+    let _ = store.freezeToday(now: Calendar.current.date(byAdding: .day, value: 1, to: start)!)
+    NavigationStack { ActivityView(store: store) }
 }

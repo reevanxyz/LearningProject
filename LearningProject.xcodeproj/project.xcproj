@@ -22,7 +22,6 @@
           "target": "LearningProject",
           "inclusions": [
             "AppColors.swift",
-            "GlassPillButtonStyle.swift",
           ],
         },
       ],

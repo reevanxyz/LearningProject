@@ -8,7 +8,9 @@ struct RootView: View {
         if store.goal == nil {
             OnboardingView(store: store)
         } else {
-            ActivityView(store: store)
+            NavigationStack {
+                ActivityView(store: store)
+            }
         }
     }
 }
